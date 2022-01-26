@@ -25,7 +25,7 @@ public class Main {
         User user = userRepo.get(id);
 
         if (user == null) {
-            System.out.println("User with id=" + id + " does not exist!");
+            System.out.println("User with id=" + id + " does not exist.");
         } else {
             System.out.println(user);
         }

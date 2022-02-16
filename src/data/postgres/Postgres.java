@@ -4,10 +4,11 @@ import data.DB;
 
 import java.sql.*;
 
-public class Postgres implements DB {
+public class Postgres implements DB { // Singleton
     private Connection conn;
+    private static final Postgres instance = new Postgres();
 
-    public Postgres() {
+    private Postgres() {
         String connectionUrl = "jdbc:postgresql://localhost:5432/simpleappdb";
 
         try {
@@ -18,6 +19,10 @@ public class Postgres implements DB {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Postgres getInstance() {
+        return instance;
     }
 
     @Override

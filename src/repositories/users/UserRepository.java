@@ -1,18 +1,13 @@
 package repositories.users;
 
 import data.DB;
-import data.postgres.Postgres;
 import models.User;
-import repositories.EntityRepository;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserRepository implements EntityRepository<User> {
+public class UserRepository implements IUserRepository {
     private final DB db;
 
     public UserRepository(DB db) {
@@ -24,8 +19,9 @@ public class UserRepository implements EntityRepository<User> {
         User user = null;
         try {
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE id=" + id);
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE id=?");
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 user = new User(rs.getInt("id"),
@@ -65,9 +61,10 @@ public class UserRepository implements EntityRepository<User> {
     public boolean create(User user) {
         try {
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            stmt.execute("INSERT INTO users(name, surname) " +
-                    "VALUES('" + user.getName() + "','" + user.getSurname() + "')");
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO users(name, surname) VALUES(?,?)");
+            stmt.setString(1, user.getName());
+            stmt.setString(2, user.getSurname());
+            stmt.execute();
 
             return true;
         } catch (SQLException e) {
@@ -81,8 +78,9 @@ public class UserRepository implements EntityRepository<User> {
     public boolean delete(int id) {
         try {
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            stmt.execute("DELETE FROM users WHERE id = " + id);
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM users WHERE id = ?");
+            stmt.setInt(1, id);
+            stmt.execute();
 
             return true;
         } catch (SQLException e) {
